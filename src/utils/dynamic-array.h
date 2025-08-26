@@ -18,12 +18,12 @@ struct dynamic_array_header {
 
 void darray_iterate(void* array, void (*func)(void* param));
 void* _darray_create(size_t capacity, size_t stride, int factor);
-void darray_destroy(void* array);
+void _darray_destroy(void** array);
 void* _darray_push(void* array, const void* value_ptr);
 void* _darray_insert_at(void* array, size_t index, const void* value_ptr);
 void darray_pop(void* array, void* dest);
 void* darray_pop_at(void* array, size_t index, void* dest);
-
+int darray_is_invalid(void* array);
 
 #define darray_create(type) \
   (type*)_darray_create(1, sizeof(type), 2)
@@ -41,6 +41,11 @@ void* darray_pop_at(void* array, size_t index, void* dest);
   { \
     typeof(value) __tmp = value; \
     array = _darray_insert_at(array, index, (const void*)&__tmp); \
+  }
+
+#define darray_destroy(parray) \
+  { \
+    _darray_destroy((void**)parray); \
   }
 
 #define DEFINE_DARRAY(name, type) \

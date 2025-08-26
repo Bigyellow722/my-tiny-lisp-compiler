@@ -13,6 +13,11 @@ sources = [
   'src/utils/dynamic-array.c'
 ]
 
+test_darray_srcs = [
+  'src/utils/dynamic-array.c',
+  'test/test-darray.c'
+]
+
 dependencies = [
 ]
 
@@ -23,4 +28,12 @@ exe = executable(
   install : true,
 )
 
+test_darray = executable(
+  'test-darray',
+  test_darray_srcs,
+  dependencies : dependencies,
+  install : true,
+)
+
 test('basic', exe)
+test('test-darray', test_darray)

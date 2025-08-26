@@ -17,7 +17,7 @@ void darray_iterate(void* array, void (*func)(void* param))
 
 /*
  * output:
- *  @array_ptr: return a pointer to the allocated array. On error, return NULL. 
+ *  @array_ptr: return a pointer to the allocated array. On error, return NULL + sizeof(darray_header).
  * input:
  *  @capacity:
  *  @stride: the size of item
@@ -27,13 +27,13 @@ void* _darray_create(size_t capacity, size_t stride, int factor)
   assert(capacity != 0 && factor != 0);
   size_t header_size = sizeof(struct dynamic_array_header);
   size_t array_size = capacity * stride;
-  void* new_array = 0;
+  void* new_array = NULL;
   struct dynamic_array_header* header = NULL;
 
   new_array = malloc(header_size + array_size);
   if (!new_array) {
-    fprintf(stderr, "%s, %d\n", __func__, __LINE__);
-    return NULL;
+    fprintf(stderr, "%s, line(%d): failed to malloc (%lu) with caps(%lu) stride(%lu) factor(%d)\n", __func__, __LINE__, header_size + array_size, capacity, stride, factor);
+    return (void*)((char*)NULL + header_size);
   }
   memset(new_array, 0, header_size + array_size);
   header = new_array;
@@ -44,18 +44,19 @@ void* _darray_create(size_t capacity, size_t stride, int factor)
   return (void *)((char *)new_array + header_size);
 }
 
-int darray_is_valid(void* array)
+int darray_is_invalid(void* array)
 {
   char* ptr = (char*)DARRAY_TO_HEADER(array);
-  return  ptr != NULL;
+  return  ptr == NULL;
 }
 
-void darray_destroy(void* array)
+void _darray_destroy(void** array)
 {
-  if (DARRAY_TO_HEADER(array)) {
+  if (!darray_is_invalid(*array)) {
     size_t header_size = sizeof(struct dynamic_array_header);
-    struct dynamic_array_header* header = (struct dynamic_array_header*)((char *)array - header_size);
+    struct dynamic_array_header* header = (struct dynamic_array_header*)((char *)(*array) - header_size);
     free(header);
+    header = NULL;
   }
 }
 
@@ -70,7 +71,7 @@ static void* darray_resize(void* array)
   struct dynamic_array_header* header = (struct dynamic_array_header*)((char *)array - header_size);
 
   void* new_array = _darray_create(header->capacity * header->factor, header->stride, header->factor);
-  if (!new_array) {
+  if (darray_is_invalid(new_array)) {
     fprintf(stderr, "%s, no enough memory\n", __func__);
     exit(1);
   }
@@ -79,7 +80,7 @@ static void* darray_resize(void* array)
   
   struct dynamic_array_header* new_header = (struct dynamic_array_header*)((char *)new_array - header_size);
   new_header->count = header->count;
-  darray_destroy(array);
+  _darray_destroy((void**)&array);
   return new_array;
 }
 
