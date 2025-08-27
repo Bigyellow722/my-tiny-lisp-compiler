@@ -23,5 +23,4 @@ typedef struct {
 token* token_make(token_type type, char* buf, size_t size, int line);
 void token_free(token** t);
 void token_dump(token* t);
-  
 #endif

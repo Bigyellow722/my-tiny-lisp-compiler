@@ -6,15 +6,13 @@
 #include "utils/dynamic-array.h"
 
 typedef struct {
-  /* source file */
-  FILE* src;
-  char* line_buf;
-  size_t line_caps;
-  /* token array */
-  token* token_da;
+  /* token pointer array */
+  token** token_da;
 } lexer;
 
-lexer* lexer_make(const char* file_name);
+lexer* lexer_make();
 void lexer_free(lexer** l);
+int lexer_tokenize_line(lexer* l, char* code, ssize_t line_sz, int line_num);
+void lexer_dump_tokens(lexer* l);
 
 #endif

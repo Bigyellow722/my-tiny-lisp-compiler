@@ -63,17 +63,31 @@ int main(int argc, char **argv) {
   }
   printf("%d: %s\n", optind, argv[optind]);
 
+  FILE* src;
   ssize_t line_sz = 0;
-  lexer* g_lexer = lexer_make(argv[optind]);
+  char* line_buf = NULL;
+  size_t line_caps = 0;
+  size_t cur_line_num = 0;
+  int res = 0;
+  lexer* g_lexer = lexer_make();
   if (!g_lexer) {
     fprintf(stderr, "failed to create the global lexer\n");
+    return 0;
+  }
+  src = fopen(argv[optind], "r");
+  if (!src) {
+    fprintf(stderr, "failed to open %s, error msg:%s\n", argv[optind], strerror(errno));
     lexer_free(&g_lexer);
     return 0;
   }
-  while ((line_sz = getline(&g_lexer->line_buf, &g_lexer->line_caps, g_lexer->src)) != -1) {
-    printf("size: %d %s", (int)line_sz, g_lexer->line_buf);
+  while ((line_sz = getline(&line_buf, &line_caps, src)) != -1) {
+    cur_line_num++;
+    printf("line(%ld) size: %d %s", cur_line_num, (int)line_sz, line_buf);
+    res = lexer_tokenize_line(g_lexer, line_buf, line_sz, cur_line_num);
   }
 
+  lexer_dump_tokens(g_lexer);
+  free(line_buf);
   lexer_free(&g_lexer);
   return 0;
 }
