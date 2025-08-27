@@ -10,7 +10,8 @@ sources = [
   'src/my_lisp.c',
   'src/token.c',
   'src/lexer.c',
-  'src/utils/dynamic-array.c'
+  'src/utils/dynamic-array.c',
+  'src/utils/byte-buffer.c'
 ]
 
 test_darray_srcs = [
