@@ -19,6 +19,12 @@ test_darray_srcs = [
   'test/test-darray.c'
 ]
 
+test_bbuf_srcs = [
+  'src/utils/byte-buffer.c',
+  'test/test-bbuf.c'
+]
+
+
 dependencies = [
 ]
 
@@ -36,5 +42,14 @@ test_darray = executable(
   install : true,
 )
 
+test_bbuf = executable(
+  'test-bbuf',
+  test_bbuf_srcs,
+  dependencies : dependencies,
+  install : true,
+)
+
+
 test('basic', exe)
 test('test-darray', test_darray)
+test('test-bbuf', test_bbuf)
