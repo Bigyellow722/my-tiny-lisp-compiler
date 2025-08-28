@@ -14,7 +14,16 @@ char* bbuf_make(size_t caps);
 void bbuf_reset(char* bbuf);
 void bbuf_free(char** bbuf);
 void bbuf_dump(char* bbuf);
-void* bbuf_append_raw(char* bbuf, char* src_buf, size_t buf_size);
-char* bbuf_append(char* src_bbuf, char* dst_bbuf);
+char* _bbuf_append_raw(char* bbuf, char* src_buf, size_t buf_size);
+char* _bbuf_append(char* src_bbuf, char* dst_bbuf);
 
+#define bbuf_append_raw(bbuf, src, size) \
+  { \
+    bbuf = _bbuf_append_raw(bbuf, src, size); \
+  }
+
+#define bbuf_append(dest, src) \
+  { \
+    dest = _bbuf_append(dest, src); \
+  }
 #endif
